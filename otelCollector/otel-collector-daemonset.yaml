@@ -1,0 +1,31 @@
+apiVersion: opentelemetry.io/v1alpha1
+kind: OpenTelemetryCollector
+metadata:
+  name: otel-collector-daemonset
+  namespace: otel-collector
+spec:
+  mode: daemonset
+  config: |
+    receivers:
+      otlp:
+        protocols:
+          grpc: 
+          http:
+    processors:
+      batch:
+    extensions:
+      health_check:
+    exporters:
+      otlp/jaeger:
+        endpoint: "10.24.3.98:4317"
+        tls:
+          insecure: true
+      logging:
+        verbosity: detailed
+    service:
+      extensions: [health_check]
+      pipelines:
+        traces:
+          receivers: [otlp]
+          processors: [batch]
+          exporters: [otlp/jaeger, logging]

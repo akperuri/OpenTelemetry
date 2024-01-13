@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: otelcol-demo-app
+  name: otelcol-demo-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: otelcol-demo-app
+  template:
+    metadata:
+      labels:
+        app: otelcol-demo-app
+    spec:
+      containers:
+      - image: # Insert the Otel Application Image Here
+        imagePullPolicy: IfNotPresent
+        name: otelcol-demo-app
+        env:
+        - name: OTLP_ENDPOINT
+          value: # Enter the otel-collector IP here
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: otelcol-demo-app
+  name: otelcol-demo-app
+spec:
+  ports:
+  - port: 8080
+    protocol: TCP
+    targetPort: 8080
+    name: web
+  selector:
+    app: otelcol-demo-app
+  type: LoadBalancer
